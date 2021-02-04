@@ -13,14 +13,16 @@ class CarIndex extends Component {
 
   renderCar = (car) => {
     return (
-      <div className="car-smallad" key={car.id}>
-        <div className="car-details">
-          <span>{car.brand} - {car.model}</span>
-          <ul>
-            <li><strong>Owner:</strong> {car.owner}</li>
-          </ul>
+      <Link to={`/cars/${car.id}`} key={car.id}>
+        <div className="car-smallad">
+          <div className="car-details">
+            <span>{car.brand} - {car.model}</span>
+            <ul>
+              <li><strong>Owner:</strong> {car.owner}</li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </Link>
     );
   }
 

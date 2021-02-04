@@ -6,6 +6,24 @@ import { createCar } from '../actions';
 
 import Aside from '../components/aside';
 
+const renderField = ({ input, label, type, meta: { touched, error, warning } }) => {
+  return (
+    <div className="form-group">
+      <label>{label}</label>
+      <div>
+        <input
+          className="form-control"
+          type={type}
+          {...input}
+        />
+        {touched
+          && ((error && <span>{error}</span>)
+            || (warning && <span>{warning}</span>))}
+      </div>
+    </div>
+  );
+};
+
 class CarNew extends Component {
   onSubmit = (values) => {
     this.props.createCar(values, this.props.garage, (car) => {
@@ -14,31 +32,6 @@ class CarNew extends Component {
     });
   }
 
-  presence = (value) => {
-    return value ? undefined : 'Required';
-  };
-
-  plateFormer = (value) => {
-    return value && !/[A-Z]*/.test(value) ? 'Should be all caps and no special characters' : undefined;
-  };
-
-  renderField(field) {
-    return (
-      <div className="form-group">
-        <label>{field.label}</label>
-        <div>
-          <input
-            className="form-control"
-            type={field.type}
-            {...field.input}
-          />
-          {field.touched
-            && ((field.error && <span>{field.error}</span>)
-              || (field.warning && <span>{field.warning}</span>))}
-        </div>
-      </div>
-    );
-  }
 
   render() {
     return (
@@ -49,30 +42,25 @@ class CarNew extends Component {
             label="Brand"
             name="brand"
             type="text"
-            component={this.renderField}
-            validate={this.presence}
+            component={renderField}
           />
           <Field
             label="Model"
             name="model"
             type="text"
-            component={this.renderField}
-            validate={this.presence}
+            component={renderField}
           />
           <Field
             label="Owner"
             name="owner"
             type="text"
-            component={this.renderField}
-            validate={this.presence}
+            component={renderField}
           />
           <Field
             label="Plate"
             name="plate"
             type="text"
-            component={this.renderField}
-            validate={this.presence}
-            warn={this.plateFormat}
+            component={renderField}
           />
           <button
             className="btn btn-primary"
@@ -93,5 +81,19 @@ function mapStateToProps(state) {
   };
 }
 
-export default reduxForm({ form: 'newCarForm' })(
+const validate = (values) => {
+  const errors = {};
+  if (!values.brand) errors.brand = 'Required';
+  if (!values.model) errors.model = 'Required';
+  if (!values.owner) errors.owner = 'Required';
+  if (!values.plate) {
+    errors.plate = 'Required';
+  } else if (!/[A-Z]*/.test(values.plate)) {
+    errors.plate = 'Should be all caps and no special characters';
+  }
+
+  return errors;
+}
+
+export default reduxForm({ form: 'newCarForm', validate })(
   connect(mapStateToProps, { createCar })(CarNew));
